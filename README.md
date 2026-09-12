@@ -334,9 +334,6 @@ At the end of the project, the team expects to have an enterprise-level full-sta
 
 [View Scrum Board](https://github.com/users/BANCUNGUYE66/projects/1)
 
-### System Architecture
-
-[View System Architecture](INSERT-DRAWIO-LINK-HERE)
 
 ## 16. Team Collaboration
 
