@@ -248,29 +248,8 @@ The team will use Git and GitHub for collaborative development.
 
 The general workflow will be:
 
-```text
-Create Issue
-     ↓
-Assign Issue
-     ↓
-Move to "In Progress"
-     ↓
-Create Feature Branch
-     ↓
-Develop Feature
-     ↓
-Commit Changes
-     ↓
-Push Branch to GitHub
-     ↓
-Create Pull Request
-     ↓
-Code Review
-     ↓
-Merge to Main
-     ↓
-Move Issue to "Done"
-```
+<img width="282" height="962" alt="MoMo SMS Data Processing drawio" src="https://github.com/user-attachments/assets/f43a4057-73cc-4acb-96f1-c65ce9a0ad8e" />
+
 
 The team will use meaningful commit messages and feature branches to reduce conflicts and maintain a clean project history.
 
@@ -303,18 +282,6 @@ Frontend Dashboard
      │
      ▼
 Charts, Tables & Insights
-```
-
-### Architecture Diagram
-
-The high-level architecture diagram will be created using Draw.io / diagrams.net.
-
-[View System Architecture](INSERT-DRAWIO-LINK-HERE)
-
-The architecture image will also be stored in the repository:
-
-```text
-docs/system-architecture.png
 ```
 
 ## 12. Agile / Scrum Approach
