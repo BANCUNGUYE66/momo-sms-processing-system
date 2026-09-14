@@ -1,0 +1,119 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.4.0">
+  <diagram name="Page-1" id="GpxJXSuTPgiUvX_Mfn8l">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-4" edge="1" parent="1" source="dB0OMrrlmkTM3CeMxYxn-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="dB0OMrrlmkTM3CeMxYxn-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#66B2FF;" value="XML Files&lt;div&gt;Momo SMS transactions data&lt;/div&gt;&lt;div&gt;in XML&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="181" x="330" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-5" edge="1" parent="1" source="dB0OMrrlmkTM3CeMxYxn-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" target="dB0OMrrlmkTM3CeMxYxn-6">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="360" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#67AB9F;" value="Raw XML data" vertex="1">
+          <mxGeometry height="20" width="121" x="330" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-8" edge="1" parent="1" source="dB0OMrrlmkTM3CeMxYxn-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dB0OMrrlmkTM3CeMxYxn-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#66B2FF;" value="XML Parser&lt;div&gt;parse_xml.py&lt;/div&gt;&lt;div&gt;ElementTree/xml&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="141" x="300" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-10" edge="1" parent="1" source="dB0OMrrlmkTM3CeMxYxn-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dB0OMrrlmkTM3CeMxYxn-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#66B2FF;" value="Data Cleaner&lt;div&gt;Amout &amp;amp; date normalization&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="151" x="460" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-12" edge="1" parent="1" source="dB0OMrrlmkTM3CeMxYxn-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dB0OMrrlmkTM3CeMxYxn-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#66B2FF;" value="Category&lt;div&gt;category.py&lt;/div&gt;&lt;div&gt;Transaction classification&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="181" x="630" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-15" edge="1" parent="1" source="dB0OMrrlmkTM3CeMxYxn-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.6;entryY=-0.029;entryDx=0;entryDy=0;entryPerimeter=0;" target="dB0OMrrlmkTM3CeMxYxn-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="925" y="360" />
+              <mxPoint x="880" y="360" />
+              <mxPoint x="880" y="390" />
+              <mxPoint x="490" y="390" />
+              <mxPoint x="490" y="380" />
+              <mxPoint x="470" y="380" />
+              <mxPoint x="470" y="398" />
+            </Array>
+            <mxPoint x="470" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#66B2FF;" value="Data Loader&lt;div&gt;load_db.py&lt;/div&gt;&lt;div&gt;dsa_search.py&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="191" x="830" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-24" edge="1" parent="1" source="dB0OMrrlmkTM3CeMxYxn-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dB0OMrrlmkTM3CeMxYxn-19" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CC99FF;" value="SQL Database&lt;div&gt;Relational storage&lt;/div&gt;&lt;div&gt;Transactions records&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="161" x="360" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#67AB9F;" value="processed data" vertex="1">
+          <mxGeometry height="30" width="121" x="720" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-17" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CC99FF;" value="JSON Export&lt;div&gt;json_schemas.json&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="181" x="590" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CC99FF;" value="Scripts" vertex="1">
+          <mxGeometry height="70" width="171" x="810" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-28" edge="1" parent="1" source="dB0OMrrlmkTM3CeMxYxn-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dB0OMrrlmkTM3CeMxYxn-21" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-19" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;" value="RESTAPI&lt;div&gt;/transactions&lt;/div&gt;&lt;div&gt;/analytics endpoints&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="191" x="380" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;" value="Database Connector&lt;div&gt;MySQL connection&lt;/div&gt;&lt;div&gt;Query optimization&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="181" x="610" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-21" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#97D077;" value="data&lt;div&gt;chart_handlers.js&lt;/div&gt;&lt;div&gt;Data visualization&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="181" x="380" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-22" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#97D077;" value="Dashboard&lt;div&gt;index.html&lt;/div&gt;&lt;div&gt;interactive analytics&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="171" x="610" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-23" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#97D077;" value="styling&lt;div&gt;styles.css&lt;/div&gt;&lt;div&gt;responsive design&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="211" x="820" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-26" edge="1" parent="1" source="dB0OMrrlmkTM3CeMxYxn-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dB0OMrrlmkTM3CeMxYxn-25" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="440" y="490" as="sourcePoint" />
+            <mxPoint x="475" y="550" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-25" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#67AB9F;" value="Structure Data" vertex="1">
+          <mxGeometry height="20" width="151" x="400" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-29" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#67AB9F;" value="REST API" vertex="1">
+          <mxGeometry height="20" width="121" x="450" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-30" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#67AB9F;" value="Data Input" vertex="1">
+          <mxGeometry height="30" width="121" x="170" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-31" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#67AB9F;" value="Pipelines" vertex="1">
+          <mxGeometry height="30" width="121" x="160" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-32" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#67AB9F;" value="Data storage" vertex="1">
+          <mxGeometry height="30" width="121" x="160" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-33" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#67AB9F;" value="API Layer" vertex="1">
+          <mxGeometry height="30" width="121" x="170" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="dB0OMrrlmkTM3CeMxYxn-34" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#67AB9F;" value="Frontend" vertex="1">
+          <mxGeometry height="30" width="121" x="180" y="700" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
