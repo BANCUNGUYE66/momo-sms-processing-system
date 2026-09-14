@@ -255,7 +255,9 @@ The team will use meaningful commit messages and feature branches to reduce conf
 
 ## 11. System Architecture
 
-The proposed system processes MoMo SMS data through several stages.
+The proposed system processes MoMo SMS data through several stages:
+
+![MoMo SMS System Architecture](docs/system-architecture.png)
 
 ```text
 MoMo SMS XML

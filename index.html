@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoMo SMS Processing & Analytics Dashboard</title>
+    <meta name="description" content="Enterprise Fullstack MoMo SMS Data Processing and Visualization Dashboard">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="web/styles.css">
+    <!-- Chart.js for Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <div class="brand-text">
+                    <h2>MoMo Analytics</h2>
+                    <span>SMS Processing System</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="#overview" class="nav-item active"><span class="icon">📊</span> Dashboard</a>
+                <a href="#transactions" class="nav-item"><span class="icon">📑</span> Transactions</a>
+                <a href="#analytics" class="nav-item"><span class="icon">📈</span> Analytics</a>
+                <a href="#etl-logs" class="nav-item"><span class="icon">⚙️</span> ETL Status</a>
+            </nav>
+            <div class="team-badge">
+                <p>Team Branch: <code>jd-setup</code></p>
+                <p>Status: <strong>Active</strong></p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-title">
+                    <h1>Enterprise MoMo SMS Dashboard</h1>
+                    <p>Cleaned, categorized, and structured Mobile Money transaction insights.</p>
+                </div>
+                <div class="header-actions">
+                    <button id="btn-run-etl" class="btn btn-primary"><span class="icon">🔄</span> Reload Data</button>
+                </div>
+            </header>
+
+            <!-- Metrics Grid -->
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Total Volume</span>
+                        <span class="metric-badge success">+12.4%</span>
+                    </div>
+                    <div class="metric-value" id="val-total-volume">RWF 0</div>
+                    <div class="metric-sub">Sum of valid processed transactions</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Total Transactions</span>
+                        <span class="metric-badge primary">Live</span>
+                    </div>
+                    <div class="metric-value" id="val-total-count">0</div>
+                    <div class="metric-sub">Parsed from momo.xml</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Categories</span>
+                        <span class="metric-badge info">Rules Applied</span>
+                    </div>
+                    <div class="metric-value" id="val-category-count">5</div>
+                    <div class="metric-sub">Transfer, Receive, Payment, Airtime...</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Data Quality</span>
+                        <span class="metric-badge warning">Cleaned</span>
+                    </div>
+                    <div class="metric-value" id="val-data-quality">100%</div>
+                    <div class="metric-sub">Zero parsing dead-letters</div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Transaction Categories Breakdown</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Volume Trends by Type</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transactions Table -->
+            <section class="table-card">
+                <div class="table-header">
+                    <h3>Recent Processed Transactions</h3>
+                    <div class="table-search">
+                        <input type="text" id="search-input" placeholder="Search phone number or description...">
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Sender / Address</th>
+                                <th>Amount (RWF)</th>
+                                <th>Category</th>
+                                <th>Raw Text Snippet</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr>
+                                <td colspan="5" class="empty-state">Loading transaction data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="web/chart_handler.js"></script>
+</body>
+</html>
