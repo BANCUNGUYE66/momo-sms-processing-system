@@ -11,11 +11,15 @@ def normalize_phone_number(phone_str: str) -> str:
         return f"+{digits}"
     elif len(digits) == 9 and digits.startswith("7"):
         return f"+250{digits}"
+    elif len(digits) == 10 and digits.startswith("0"):
+        return f"+250{digits[1:]}"
     return phone_str.strip()
 
 def extract_amount(body: str) -> Optional[float]:
     """Extracts monetary amount (e.g., RWF amount) from SMS body."""
-    match = re.search(r"(?:RWF|FRW|amount:?)\s*([\d,]+)", body, re.IGNORECASE)
+    match = re.search(r"([\d,]+)\s*(?:RWF|FRW)\b", body, re.IGNORECASE)
+    if not match:
+        match = re.search(r"(?:RWF|FRW|amount:?)\s*([\d,]+)", body, re.IGNORECASE)
     if match:
         amount_str = match.group(1).replace(",", "")
         try:

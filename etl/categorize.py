@@ -5,6 +5,6 @@ def categorize_transaction(text: str) -> str:
     text_lower = text.lower()
     for category, keywords in CATEGORIES.items():
         for kw in keywords:
-            if kw in text_lower:
+            if kw.lower() in text_lower:
                 return category
     return "OTHER"
