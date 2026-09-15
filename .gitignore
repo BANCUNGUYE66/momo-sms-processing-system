@@ -51,8 +51,11 @@ data/logs/*.log
 !data/logs/dead_letter/.gitkeep
 
 # IDE & Editor files
-.vscode/
 .idea/
 *.swp
 *.swo
 .DS_Store
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore

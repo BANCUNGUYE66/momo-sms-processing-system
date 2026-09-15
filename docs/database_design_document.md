@@ -2,161 +2,130 @@
 
 **Course**: Enterprise Software Development  
 **Project**: MoMo SMS Data Processing & Analytics System  
-**Document**: Database Design & Implementation Report  
 **Author**: Jean de Dieu Tuyishime (Architecture / QA)  
-**Team Lead**: Aimable  
-**Team Members**: Aimable, Richard, Jean de Dieu Tuyishime, Eloi  
+**Team**: Aimable (Lead), Richard, Jean de Dieu Tuyishime, Eloi  
 
 ---
 
-## 1. Executive Overview
+## 1. Data Dictionary
 
-This document presents the complete database design and implementation for the Mobile Money (MoMo) SMS Processing System. The database translates raw XML mobile money transaction logs into a 3NF-compliant relational database schema using MySQL 8.0. The architecture is optimized for high-throughput transaction ingestion, referential integrity, automated reporting, and analytical data visualization.
-
----
-
-## 2. Section 1: Entity Relationship Diagram (ERD) & Design Rationale
-
-### 2.1 Entity Relationship Diagram (ERD)
-The system ERD consists of five core domain entities:
-1. `Users` (Wallet holders, customers, merchants, agents)
-2. `Transaction_Categories` (Classification rules for MoMo payments)
-3. `User_Category_Preferences` (Junction entity resolving Many-to-Many M:N relationship)
-4. `Transactions` (Central record of parsed financial transactions)
-5. `System_Logs` (Isolated audit log tracking pipeline operations)
-
-*(Embed your ERD Diagram image `docs/erd_diagram.pdf` / `docs/erd_diagram.png` here)*
-
-### 2.2 Design Rationale & Justification (257 Words)
-
-The MoMo SMS Data Processing System database architecture is designed to translate unstructured Mobile Money SMS transaction records into a 3NF-compliant relational database. The schema prioritizes data normalization, referential integrity, query performance, and analytical scalability.
-
-1. **Entity Identification & Data Normalization**:
-   The schema centers on four domain entities: `Users`, `Transactions`, `Transaction_Categories`, and `System_Logs`. Normalizing user details into a dedicated `Users` entity eliminates redundant sender and receiver data. Each user can participate in multiple transactions as a sender or receiver, represented through dual 1:M relationships (`sender_id` and `receiver_id` foreign keys referencing the `Users` primary key).
-
-2. **Transaction Categorization & Analytical Aggregations**:
-   Transactions are classified by linking each transaction record to a `Transaction_Categories` entity via a 1:M foreign key relationship (`category_id`). Pre-defining explicit categories (e.g., Peer Payment, Cash In, Airtime, Transfer) optimizes SQL aggregation queries, accelerates summary reporting, and ensures consistent transaction classification.
-
-3. **Resolving Many-to-Many (M:N) Relationships**:
-   To support individual user notification preferences across various transaction categories, a Many-to-Many (M:N) relationship exists between `Users` and `Transaction_Categories`. This is cleanly resolved using a dedicated junction table, `User_Category_Preferences`, featuring composite primary keys (`user_id`, `category_id`) and explicit foreign key constraints, preserving 3NF relational purity.
-
-4. **Auditability & System Health Monitoring**:
-   The `System_Logs` entity isolates operational logging, XML parsing exceptions, and dead-letter queue events from financial transaction storage. This architectural decoupling ensures high-volume diagnostic logging does not degrade transaction processing speeds while maintaining complete system auditability.
-
-Overall, this entity-relationship design guarantees strict referential integrity, eliminates data anomalies, and provides an efficient foundation for enterprise mobile money analytics.
-
----
-
-## 3. Section 2: Data Dictionary
-
-### Table 1: `users`
-Stores registered Mobile Money users, merchants, and agents.
+### 1.1 Table: `users`
+Stores registered Mobile Money account holders, customers, merchants, and agents.
 
 | Column Name | Data Type | Key / Constraint | Description |
 | :--- | :--- | :--- | :--- |
-| `id` | `INT AUTO_INCREMENT` | `PRIMARY KEY` | Unique primary identifier for each user |
+| `id` | `INT AUTO_INCREMENT` | `PRIMARY KEY` | Unique identifier for each user |
 | `phone_number` | `VARCHAR(20)` | `NOT NULL, UNIQUE` | Normalized mobile phone number (`+250...`) |
-| `name` | `VARCHAR(100)` | `NOT NULL` | Full display name of the account holder |
+| `name` | `VARCHAR(100)` | `NOT NULL` | Display name of the account holder |
 | `user_type` | `ENUM('personal', 'merchant', 'agent')` | `DEFAULT 'personal'` | Role classification of wallet holder |
 | `wallet_balance` | `DECIMAL(15,2)` | `CHECK (wallet_balance >= 0.00)` | Current wallet balance in RWF |
-| `created_at` | `DATETIME` | `DEFAULT CURRENT_TIMESTAMP` | Account registration timestamp |
+| `created_at` | `DATETIME` | `DEFAULT CURRENT_TIMESTAMP` | Registration timestamp |
 
 ---
 
-### Table 2: `transaction_categories`
-Defines transaction categories for classifying MoMo SMS payments.
+### 1.2 Table: `transaction_categories`
+Defines transaction types and keyword classification rules.
 
 | Column Name | Data Type | Key / Constraint | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `INT AUTO_INCREMENT` | `PRIMARY KEY` | Unique category identifier |
 | `category_name` | `VARCHAR(50)` | `NOT NULL, UNIQUE` | Name of category (e.g., Peer Payment) |
-| `tx_type` | `ENUM('payment', 'transfer', 'deposit', 'airtime')` | `NOT NULL` | High-level transaction type |
-| `description` | `TEXT` | Optional | Category description and keyword rules |
-| `created_at` | `DATETIME` | `DEFAULT CURRENT_TIMESTAMP` | Timestamp when category was added |
+| `tx_type` | `ENUM('payment', 'transfer', 'deposit', 'airtime')` | `NOT NULL` | High-level transaction classification |
+| `description` | `TEXT` | Optional | Detailed category description |
+| `created_at` | `DATETIME` | `DEFAULT CURRENT_TIMESTAMP` | Creation timestamp |
 
 ---
 
-### Table 3: `user_category_preferences` (Junction Table)
+### 1.3 Table: `user_category_preferences` (Junction Table for M:N)
 Resolves Many-to-Many (M:N) relationship between Users and Transaction Categories.
 
 | Column Name | Data Type | Key / Constraint | Description |
 | :--- | :--- | :--- | :--- |
 | `user_id` | `INT` | `PK, FK (users.id)` | Foreign key referencing `users.id` |
 | `category_id` | `INT` | `PK, FK (transaction_categories.id)` | Foreign key referencing `transaction_categories.id` |
-| `notification_enabled` | `BOOLEAN` | `DEFAULT TRUE` | Alert preference toggle |
+| `notification_enabled` | `BOOLEAN` | `DEFAULT TRUE` | Category notification alert preference |
 | `created_at` | `DATETIME` | `DEFAULT CURRENT_TIMESTAMP` | Setting creation timestamp |
 
 ---
 
-### Table 4: `transactions`
-Main transaction table storing cleaned and extracted MoMo SMS records.
+### 1.4 Table: `transactions`
+Central transaction table storing cleaned MoMo SMS records.
 
 | Column Name | Data Type | Key / Constraint | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `INT AUTO_INCREMENT` | `PRIMARY KEY` | Unique transaction identifier |
 | `transaction_ref` | `VARCHAR(50)` | `NOT NULL, UNIQUE` | Reference code (e.g., `76662021700`) |
-| `sender_id` | `INT` | `FK (users.id)` | Foreign key referencing sender user |
-| `receiver_id` | `INT` | `FK (users.id), NULLABLE` | Foreign key referencing receiver user |
+| `sender_id` | `INT` | `FK (users.id)` | Foreign key referencing sender |
+| `receiver_id` | `INT` | `FK (users.id), NULLABLE` | Foreign key referencing receiver |
 | `category_id` | `INT` | `FK (transaction_categories.id)` | Foreign key referencing category |
 | `amount` | `DECIMAL(12,2)` | `CHECK (amount > 0.00)` | Monetary value in RWF |
 | `fee_charged` | `DECIMAL(10,2)` | `CHECK (fee_charged >= 0.00)` | Service fee charged |
 | `closing_balance` | `DECIMAL(15,2)` | Optional | Wallet balance after transaction |
 | `timestamp` | `DATETIME` | `NOT NULL` | Date and time transaction took place |
-| `status` | `ENUM('completed', 'failed', 'pending')` | `DEFAULT 'completed'` | Transaction execution status |
-| `raw_text` | `TEXT` | `NOT NULL` | Unaltered original XML/SMS text body |
-| `created_at` | `DATETIME` | `DEFAULT CURRENT_TIMESTAMP` | Ingestion timestamp |
+| `status` | `ENUM('completed', 'failed', 'pending')` | `DEFAULT 'completed'` | Execution status |
+| `raw_text` | `TEXT` | `NOT NULL` | Original SMS message body |
+| `created_at` | `DATETIME` | `DEFAULT CURRENT_TIMESTAMP` | System ingestion timestamp |
 
 ---
 
-### Table 5: `system_logs`
-Audit log for tracking ETL processing events, warnings, and errors.
+### 1.5 Table: `system_logs`
+Audit log tracking pipeline operational events and diagnostic errors.
 
 | Column Name | Data Type | Key / Constraint | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `INT AUTO_INCREMENT` | `PRIMARY KEY` | Unique log entry identifier |
-| `log_level` | `ENUM('INFO', 'WARNING', 'ERROR')` | `NOT NULL` | Severity level of the logged event |
+| `log_level` | `ENUM('INFO', 'WARNING', 'ERROR')` | `NOT NULL` | Severity level of log |
 | `module_name` | `VARCHAR(50)` | `NOT NULL` | Ingestion component module |
-| `message` | `TEXT` | `NOT NULL` | Detailed log message string |
+| `message` | `TEXT` | `NOT NULL` | Diagnostic log string |
 | `timestamp` | `DATETIME` | `DEFAULT CURRENT_TIMESTAMP` | Event timestamp |
 
 ---
 
-## 4. Section 3: Security & Data Integrity Rules
+## 2. Database Security & Data Integrity Rules
 
 1. **Referential Integrity Constraints**:
-   - All relationship foreign keys use explicit cascades: `sender_id` enforces `ON DELETE RESTRICT` to preserve historical transaction records, while `receiver_id` allows `ON DELETE SET NULL`.
-2. **Value Domain Rules (`CHECK` Constraints)**:
-   - `CONSTRAINT chk_tx_amount CHECK (amount > 0.00)`: Restricts non-positive or negative transaction amounts.
-   - `CONSTRAINT chk_fee_charged CHECK (fee_charged >= 0.00)`: Prevents negative fee calculations.
-   - `CONSTRAINT chk_wallet_balance CHECK (wallet_balance >= 0.00)`: Prevents invalid negative balances.
-3. **Uniqueness Rules**:
-   - `transaction_ref` (`VARCHAR(50) UNIQUE`) prevents duplicate transaction entry.
-   - `phone_number` (`VARCHAR(20) UNIQUE`) prevents duplicate user registration.
+   - `CONSTRAINT fk_tx_sender FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE RESTRICT`: Blocks user deletion if linked to transaction records.
+   - `CONSTRAINT fk_tx_receiver FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE SET NULL`: Sets receiver foreign key to NULL upon account removal.
+   - `CONSTRAINT fk_tx_category FOREIGN KEY (category_id) REFERENCES transaction_categories(id) ON DELETE RESTRICT`: Prevents deletion of active categories.
+
+2. **Domain Validation Constraints (`CHECK`)**:
+   - `CONSTRAINT chk_tx_amount CHECK (amount > 0.00)`: Restricts zero or negative transaction values.
+   - `CONSTRAINT chk_fee_charged CHECK (fee_charged >= 0.00)`: Enforces non-negative transaction fees.
+   - `CONSTRAINT chk_wallet_balance CHECK (wallet_balance >= 0.00)`: Prevents negative account balances.
+
+3. **Uniqueness Constraints**:
+   - `transaction_ref` (`VARCHAR(50) UNIQUE`): Prevents duplicate transaction ingestion.
+   - `phone_number` (`VARCHAR(20) UNIQUE`): Enforces distinct mobile user identities.
 
 ---
 
-## 5. Section 4: Sample Queries & Verification Screenshots
+## 3. Sample Queries & Verification Screenshots
 
-*(Paste your 5 execution screenshots under each section below)*
+### 3.1 Table Schema Navigator
+![Database Tables Navigator](../screenshots/Tables.png)  
+*(Refer to screenshots/ directory for execution screenshot: `screenshots/Tables.png`)*
 
-### Screenshot 1: Database Table List
 ```sql
 USE momo_sms_processing_system;
 SHOW TABLES;
 ```
-*(Insert Screenshot 1 showing the list of 5 tables)*
 
 ---
 
-### Screenshot 2: SELECT * FROM transactions;
+### 3.2 Transaction Records (`SELECT * FROM transactions;`)
+![Sample Transaction Data](../screenshots/Transactions.png)  
+*(Refer to screenshots/ directory for execution screenshot: `screenshots/Transactions.png`)*
+
 ```sql
 SELECT * FROM transactions;
 ```
-*(Insert Screenshot 2 showing sample DML rows)*
 
 ---
 
-### Screenshot 3: JOIN Query Result
+### 3.3 Relational JOIN Query Result
+![Relational JOIN Query Result](../screenshots/join.png)  
+*(Refer to screenshots/ directory for execution screenshot: `screenshots/join.png`)*
+
 ```sql
 SELECT 
     t.id AS tx_id,
@@ -174,11 +143,13 @@ LEFT JOIN users r ON t.receiver_id = r.id
 JOIN transaction_categories c ON t.category_id = c.id
 ORDER BY t.timestamp DESC;
 ```
-*(Insert Screenshot 3 showing joined transaction table output)*
 
 ---
 
-### Screenshot 4: GROUP BY Aggregation Summary
+### 3.4 GROUP BY Category Aggregation Summary
+![Category Aggregation Summary](../screenshots/Aggregations.png)  
+*(Refer to screenshots/ directory for execution screenshot: `screenshots/Aggregations.png`)*
+
 ```sql
 SELECT 
     c.category_name,
@@ -188,25 +159,19 @@ FROM transaction_categories c
 LEFT JOIN transactions t ON c.id = t.category_id
 GROUP BY c.id, c.category_name;
 ```
-*(Insert Screenshot 4 showing aggregate summary table)*
 
 ---
 
-### Screenshot 5: CHECK Constraint Error Test (`amount = -500`)
-```sql
-INSERT INTO transactions (transaction_ref, sender_id, receiver_id, category_id, amount, timestamp, raw_text) 
-VALUES ('INVALID_TEST_REF', 1, 2, 1, -500.00, NOW(), 'Test invalid negative amount');
-```
-*(Insert Screenshot 5 showing MySQL Action Output error: `Error Code: 3819. Check constraint 'chk_tx_amount' is violated.`)*
+### 3.5 Database & JSON Schema Validation Test Results
+![Database Setup & Constraints Validation Test](../screenshots/database%20verification.png)  
+*(Refer to screenshots/ directory for execution screenshot: `screenshots/database verification.png`)*
+
+![JSON Data Schema & Modeling Validation Test](../screenshots/json%20valid.png)  
+*(Refer to screenshots/ directory for execution screenshot: `screenshots/json valid.png`)*
 
 ---
 
-## 6. Section 5: AI Usage & Transparency Log
-
-### Compliance Statement
-This log records AI interactions in accordance with the course **AI Usage Policy**. All domain business logic, relational database schemas, and architectural designs were authored directly to satisfy project requirements. AI tools were strictly utilized for permitted syntax verification, formatting checks, and documentation grammar polishing.
-
-### Log of AI Interactions
+## 4. AI Usage & Transparency Log
 
 | Date | Contributor | Permitted Purpose | Query / Input Description | Output / Action Taken |
 | :--- | :--- | :--- | :--- | :--- |
@@ -214,4 +179,3 @@ This log records AI interactions in accordance with the course **AI Usage Policy
 | **2026-09-15** | Jean de Dieu | Documentation Grammar & Syntax | Reviewing 250–300 word ERD design rationale text for grammatical clarity | Polished technical explanation phrasing and verified word count (257 words) |
 | **2026-09-15** | Jean de Dieu | MySQL Best Practices Verification | Researching MySQL 8.0 `COMMENT` syntax and `CHECK` constraint syntax | Confirmed `ENGINE=InnoDB` and `CONSTRAINT chk_... CHECK (...)` syntax compliance |
 | **2026-09-15** | Jean de Dieu | Git Command Syntax Verification | Checking Git command syntax for local exclude (`.git/info/exclude`) and branch management | Applied `.git/info/exclude` configuration for local file exclusion |
-
