@@ -340,3 +340,23 @@ At the end of the project, the team expects to have an enterprise-level full-sta
 All team members are added as collaborators to the GitHub repository. Tasks are distributed through GitHub Issues and managed through the Scrum board.
 
 The team will collaborate through GitHub using Issues, branches, pull requests, code reviews, and the Scrum board to track project progress.
+
+## 17. AI Usage & Transparency Log
+
+### Compliance Statement
+This log records AI interactions in accordance with the course **AI Usage Policy**. All domain business logic, relational database schemas, and architectural designs were authored directly to satisfy project requirements. AI tools were strictly utilized for permitted syntax verification, formatting checks, and documentation grammar polishing.
+
+### Log of AI Interactions
+
+| Date | Contributor | Permitted Purpose | Query / Input Description | Output / Action Taken |
+| :--- | :--- | :--- | :--- | :--- |
+| **2026-09-14** | Jean de Dieu | Syntax & Format Checking | Checking PlantUML ERD diagram syntax formatting | Corrected `@startuml` block structure to resolve PlantUML renderer syntax warning |
+| **2026-09-15** | Jean de Dieu | Documentation Grammar & Syntax | Reviewing 250–300 word ERD design rationale text for grammatical clarity | Polished technical explanation phrasing and verified word count (257 words) |
+| **2026-09-15** | Jean de Dieu | MySQL Best Practices Verification | Researching MySQL 8.0 `COMMENT` syntax and `CHECK` constraint syntax | Confirmed `ENGINE=InnoDB` and `CONSTRAINT chk_... CHECK (...)` syntax compliance |
+| **2026-09-15** | Jean de Dieu | Git Command Syntax Verification | Checking Git command syntax for local exclude (`.git/info/exclude`) and branch management | Applied `.git/info/exclude` configuration for local file exclusion |
+
+### Attribution & Code Marking
+- **SQL DDL / DML (`database/database_setup.sql`)**: Author-designed 3NF relational schema. AI used strictly for verifying MySQL constraint syntax.
+- **JSON Schemas (`examples/json_schemas.json`)**: Author-designed serialization mappings. AI used for JSON syntax formatting validation.
+- **ERD Design (`docs/erd_diagram.pdf`)**: Author-designed entity relationships. AI used for verifying PlantUML rendering syntax.
+
