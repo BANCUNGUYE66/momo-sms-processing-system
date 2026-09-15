@@ -137,67 +137,22 @@ Audit log for tracking ETL processing events, warnings, and errors.
 
 ## 5. Section 4: Sample Queries & Verification Screenshots
 
-*(Paste your 5 execution screenshots under each section below)*
+### 5.1 ERD & Database Schema Overview
+![MoMo SMS System ERD Diagram](erd_diagram.pdf)
 
-### Screenshot 1: Database Table List
-```sql
-USE momo_sms_processing_system;
-SHOW TABLES;
-```
-*(Insert Screenshot 1 showing the list of 5 tables)*
+### 5.2 SQL Queries Execution & Data Verification
+![SQL Database Queries Execution Output](../screenshots/sql_queries.png)
 
----
+### 5.3 API Endpoints & Transaction Queries
+![API Endpoints Execution](../screenshots/Endpoints.png)
 
-### Screenshot 2: SELECT * FROM transactions;
-```sql
-SELECT * FROM transactions;
-```
-*(Insert Screenshot 2 showing sample DML rows)*
+![Get All Transactions Output](../screenshots/getall_transactions.png)
 
----
+### 5.4 Database Security & Constraint Verification
+![Create Transaction Security Test](../screenshots/POST.(createnetransaction).png)
 
-### Screenshot 3: JOIN Query Result
-```sql
-SELECT 
-    t.id AS tx_id,
-    t.transaction_ref,
-    s.name AS sender_name,
-    s.phone_number AS sender_phone,
-    COALESCE(r.name, 'External/Service') AS receiver_name,
-    c.category_name,
-    t.amount,
-    t.fee_charged,
-    t.timestamp
-FROM transactions t
-JOIN users s ON t.sender_id = s.id
-LEFT JOIN users r ON t.receiver_id = r.id
-JOIN transaction_categories c ON t.category_id = c.id
-ORDER BY t.timestamp DESC;
-```
-*(Insert Screenshot 3 showing joined transaction table output)*
+![Unauthorized Credentials Test](../screenshots/unauthorized_credentials.png)
 
----
-
-### Screenshot 4: GROUP BY Aggregation Summary
-```sql
-SELECT 
-    c.category_name,
-    COUNT(t.id) AS total_count,
-    SUM(t.amount) AS total_volume_rwf
-FROM transaction_categories c
-LEFT JOIN transactions t ON c.id = t.category_id
-GROUP BY c.id, c.category_name;
-```
-*(Insert Screenshot 4 showing aggregate summary table)*
-
----
-
-### Screenshot 5: CHECK Constraint Error Test (`amount = -500`)
-```sql
-INSERT INTO transactions (transaction_ref, sender_id, receiver_id, category_id, amount, timestamp, raw_text) 
-VALUES ('INVALID_TEST_REF', 1, 2, 1, -500.00, NOW(), 'Test invalid negative amount');
-```
-*(Insert Screenshot 5 showing MySQL Action Output error: `Error Code: 3819. Check constraint 'chk_tx_amount' is violated.`)*
 
 ---
 
