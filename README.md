@@ -218,7 +218,7 @@ The Scrum board contains the following columns:
 
 ### Scrum Board
 
-[View Scrum Board](https://github.com/users/BANCUNGUYE66/projects/1)
+[View Scrum Board](https://github.com/BANCUNGUYE66/momo-sms-processing-system/issues)
 
 Tasks will initially be placed in **To Do**. When a team member starts working on a task, the task will move to **In Progress**. Once the task has been completed and reviewed, it will move to **Done**.
 
@@ -332,7 +332,7 @@ At the end of the project, the team expects to have an enterprise-level full-sta
 
 ### Scrum Board
 
-[View Scrum Board](https://github.com/users/BANCUNGUYE66/projects/1)
+[View Scrum Board](https://github.com/BANCUNGUYE66/momo-sms-processing-system/issues)
 
 
 ## 16. Team Collaboration
