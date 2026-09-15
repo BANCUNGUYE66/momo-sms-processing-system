@@ -2,107 +2,103 @@
   "schemas": {
     "overview": "JSON data models for the MoMo SMS Processing System — maps relational DB entities to API-ready structures",
 
-    "account_holder": {
-      "description": "Represents a wallet holder extracted from SMS metadata",
+    "user": {
+      "description": "Represents a Mobile Money account holder extracted from SMS metadata",
       "sample": {
-        "holder_id": 1,
-        "msisdn": "+250795963036",
-        "display_name": "Jean de Dieu Tuyishime",
-        "holder_type": "personal",
-        "wallet_id": "36521838",
-        "last_known_balance": 980.00,
-        "registered_at": "2024-05-01T08:30:00Z",
-        "last_modified": "2024-05-25T19:50:55Z"
+        "id": 1,
+        "phone_number": "+250795963036",
+        "name": "Jean de Dieu Tuyishime",
+        "user_type": "personal",
+        "wallet_balance": 980.00,
+        "created_at": "2024-05-01T08:30:00Z"
       },
       "db_mapping": {
-        "table": "account_holders",
-        "fields": ["holder_id", "msisdn", "display_name", "holder_type", "wallet_id", "last_known_balance", "registered_at", "last_modified"]
+        "table": "users",
+        "fields": ["id", "phone_number", "name", "user_type", "wallet_balance", "created_at"]
       }
     },
 
-    "tx_category": {
-      "description": "Classifies the nature of each transaction",
+    "transaction_category": {
+      "description": "Classifies the nature of each MoMo transaction",
       "sample": {
-        "cat_id": 1,
-        "cat_name": "Peer Payment",
+        "id": 1,
+        "category_name": "Peer Payment",
         "tx_type": "payment",
-        "notes": "Direct payment sent to another account holder",
-        "added_at": "2024-05-01T00:00:00Z"
+        "description": "Direct payment sent to another account holder",
+        "created_at": "2024-05-01T00:00:00Z"
       },
       "db_mapping": {
-        "table": "tx_categories",
-        "fields": ["cat_id", "cat_name", "tx_type", "notes", "added_at"]
+        "table": "transaction_categories",
+        "fields": ["id", "category_name", "tx_type", "description", "created_at"]
+      }
+    },
+
+    "user_category_preference": {
+      "description": "Junction entity representing user notification preferences for category alerts (M:N resolution)",
+      "sample": {
+        "user_id": 1,
+        "category_id": 1,
+        "notification_enabled": true,
+        "created_at": "2024-05-01T09:00:00Z"
+      },
+      "db_mapping": {
+        "table": "user_category_preferences",
+        "fields": ["user_id", "category_id", "notification_enabled", "created_at"]
       }
     },
 
     "transaction": {
-      "description": "Full transaction record enriched with related entities",
+      "description": "Full transaction record enriched with nested sender, receiver, and category entities",
       "sample": {
-        "tx_id": 1,
-        "raw_timestamp": 1715351458724,
-        "human_date": "10 May 2024 4:30:58 PM",
-        "ref_code": "76662021700",
-        "tx_amount": 3000.00,
-        "currency_code": "RWF",
+        "id": 1,
+        "transaction_ref": "76662021700",
+        "amount": 3000.00,
         "fee_charged": 0.00,
         "closing_balance": 3000.00,
-        "tx_timestamp": "2024-05-10T16:30:51Z",
-        "tx_status": "completed",
-        "sms_content": "You have received 3000 RWF from Alice Mugabo (*********013) on your mobile money account at 2024-05-10 16:30:51. Your new balance: 3000 RWF. Financial Transaction Id: 76662021700.",
+        "timestamp": "2024-05-10T16:30:51Z",
+        "status": "completed",
+        "raw_text": "You have received 3000 RWF from Alice Mugabo (+250791666666) on your mobile money account at 2024-05-10 16:30:51. Financial Transaction Id: 76662021700.",
         "sender": {
-          "holder_id": null,
-          "display_name": "Alice Mugabo"
+          "id": 2,
+          "name": "Alice Mugabo",
+          "phone_number": "+250791666666",
+          "user_type": "personal"
         },
         "receiver": {
-          "holder_id": 1,
-          "msisdn": "+250795963036",
-          "display_name": "Jean de Dieu Tuyishime"
+          "id": 1,
+          "name": "Jean de Dieu Tuyishime",
+          "phone_number": "+250795963036",
+          "user_type": "personal"
         },
         "category": {
-          "cat_id": 2,
-          "cat_name": "Wallet Transfer",
+          "id": 2,
+          "category_name": "Wallet Transfer",
           "tx_type": "transfer"
         },
-        "logged_at": "2024-05-10T16:30:58Z"
+        "created_at": "2024-05-10T16:30:58Z"
       },
       "db_mapping": {
-        "table": "sms_transactions",
+        "table": "transactions",
         "joins": [
-          "LEFT JOIN account_holders sender ON sms_transactions.from_holder = sender.holder_id",
-          "LEFT JOIN account_holders receiver ON sms_transactions.to_holder = receiver.holder_id",
-          "JOIN tx_categories ON sms_transactions.cat_id = tx_categories.cat_id"
+          "LEFT JOIN users sender ON transactions.sender_id = sender.id",
+          "LEFT JOIN users receiver ON transactions.receiver_id = receiver.id",
+          "JOIN transaction_categories category ON transactions.category_id = category.id"
         ]
       }
     },
 
-    "holder_tx_log": {
-      "description": "Junction record linking a wallet holder to a transaction with their role",
+    "system_log": {
+      "description": "System log entry capturing processing pipeline execution events and diagnostic errors",
       "sample": {
-        "log_entry_id": 1,
-        "holder_id": 1,
-        "tx_id": 1,
-        "participant_role": "receiver",
-        "logged_at": "2024-05-10T16:30:58Z"
+        "id": 1,
+        "log_level": "INFO",
+        "module_name": "xml_parser",
+        "message": "XML payload successfully parsed. Total raw records: 5",
+        "timestamp": "2024-05-10T16:35:00Z"
       },
       "db_mapping": {
-        "table": "holder_tx_log",
-        "fields": ["log_entry_id", "holder_id", "tx_id", "participant_role", "logged_at"]
-      }
-    },
-
-    "processing_event": {
-      "description": "System log entry capturing pipeline events, warnings, and errors",
-      "sample": {
-        "event_id": 1,
-        "severity": "info",
-        "module": "xml_parser",
-        "event_detail": "XML file loaded successfully with 6 transaction records",
-        "related_ref": null,
-        "event_time": "2024-05-10T16:35:00Z"
-      },
-      "db_mapping": {
-        "table": "processing_events",
-        "fields": ["event_id", "severity", "module", "event_detail", "related_ref", "event_time"]
+        "table": "system_logs",
+        "fields": ["id", "log_level", "module_name", "message", "timestamp"]
       }
     },
 
@@ -112,111 +108,40 @@
         "data": {
           "transactions": [
             {
-              "tx_id": 1,
-              "ref_code": "76662021700",
-              "tx_amount": 3000.00,
-              "currency_code": "RWF",
-              "tx_timestamp": "2024-05-10T16:30:51Z",
+              "id": 1,
+              "transaction_ref": "76662021700",
+              "amount": 3000.00,
+              "fee_charged": 0.00,
+              "timestamp": "2024-05-10T16:30:51Z",
               "sender_name": "Alice Mugabo",
               "receiver_name": "Jean de Dieu Tuyishime",
-              "category": "Wallet Transfer",
-              "tx_status": "completed"
+              "category_name": "Wallet Transfer",
+              "status": "completed"
             },
             {
-              "tx_id": 2,
-              "ref_code": "73214484437",
-              "tx_amount": 1500.00,
-              "currency_code": "RWF",
-              "tx_timestamp": "2024-05-10T16:31:39Z",
+              "id": 2,
+              "transaction_ref": "73214484437",
+              "amount": 1500.00,
+              "fee_charged": 20.00,
+              "timestamp": "2024-05-10T16:31:39Z",
               "sender_name": "Jean de Dieu Tuyishime",
               "receiver_name": "Eric Habimana",
-              "category": "Peer Payment",
-              "tx_status": "completed"
+              "category_name": "Peer Payment",
+              "status": "completed"
             }
           ],
-          "total_count": 6,
-          "total_volume": 58800.00
-        }
-      },
-
-      "holder_summary": {
-        "status": "success",
-        "data": {
-          "holder": {
-            "holder_id": 1,
-            "msisdn": "+250795963036",
-            "display_name": "Jean de Dieu Tuyishime",
-            "holder_type": "personal",
-            "last_known_balance": 980.00
-          },
-          "activity_summary": {
-            "total_sent": 5800.00,
-            "total_received": 53000.00,
-            "sent_count": 4,
-            "received_count": 2,
-            "total_fees_paid": 100.00
-          }
-        }
-      },
-
-      "category_breakdown": {
-        "status": "success",
-        "data": {
-          "categories": [
-            {
-              "cat_name": "Peer Payment",
-              "tx_type": "payment",
-              "tx_count": 3,
-              "total_volume": 4800.00,
-              "pct_share": 8.16
-            },
-            {
-              "cat_name": "Wallet Transfer",
-              "tx_type": "transfer",
-              "tx_count": 1,
-              "total_volume": 3000.00,
-              "pct_share": 5.10
-            },
-            {
-              "cat_name": "Cash In",
-              "tx_type": "deposit",
-              "tx_count": 1,
-              "total_volume": 50000.00,
-              "pct_share": 85.03
-            },
-            {
-              "cat_name": "Airtime Top-up",
-              "tx_type": "airtime",
-              "tx_count": 1,
-              "total_volume": 1000.00,
-              "pct_share": 1.70
-            }
-          ],
-          "total_transactions": 6,
-          "grand_total_volume": 58800.00
+          "total_count": 5,
+          "total_volume": 60500.00
         }
       }
     },
 
     "mapping_guide": {
       "rules": {
-        "direct": "Most SQL columns map 1-to-1 to JSON keys",
-        "nested": "Related tables (sender, receiver, category) are embedded as child objects",
-        "computed": "Totals, counts, and percentages are derived via SQL aggregations",
-        "nulls": "SQL NULL values surface as JSON null; empty strings remain as-is"
-      },
-      "xml_to_sql": {
-        "date_attr": "Store raw XML epoch milliseconds in raw_timestamp (BIGINT)",
-        "body_attr": "Persist full SMS string in sms_content for audit trail",
-        "readable_date_attr": "Store human-readable string in human_date",
-        "amount_extraction": "Use regex on sms_content to populate tx_amount",
-        "txid_extraction": "Parse TxId token from sms_content into ref_code",
-        "recipient_extraction": "Parse beneficiary name and phone into beneficiary_name / beneficiary_msisdn"
-      },
-      "sql_to_json": {
-        "raw_timestamp": "Convert BIGINT epoch to ISO 8601 string for API consumers",
-        "sms_content": "Expose raw SMS for auditing; also expose individually parsed fields",
-        "aggregates": "Calculate summary stats server-side before serialising to JSON"
+        "direct": "SQL table columns map directly 1-to-1 to top-level JSON fields",
+        "nested": "Related entities (sender, receiver, category) are serialized as nested JSON sub-objects",
+        "computed": "Aggregated analytics (total volume, transaction counts) are calculated server-side in SQL",
+        "nulls": "SQL NULL foreign keys (e.g., receiver_id for agent top-ups) render as JSON null"
       }
     }
   }
