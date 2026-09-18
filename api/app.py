@@ -27,7 +27,10 @@ def read_root():
 def get_transactions(limit: int = 100, offset: int = 0):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM transactions LIMIT ? OFFSET ?", (limit, offset))
+    cursor.execute(
+        "SELECT * FROM v_transaction_details ORDER BY timestamp DESC LIMIT ? OFFSET ?",
+        (limit, offset),
+    )
     rows = cursor.fetchall()
     conn.close()
     return [dict(row) for row in rows]
@@ -36,10 +39,10 @@ def get_transactions(limit: int = 100, offset: int = 0):
 def get_analytics():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*), COALESCE(SUM(amount), 0) FROM transactions")
+    cursor.execute("SELECT COUNT(*), COALESCE(SUM(amount), 0) FROM v_transaction_details")
     total_count, total_volume = cursor.fetchone()
 
-    cursor.execute("SELECT category, COUNT(*) FROM transactions GROUP BY category")
+    cursor.execute("SELECT category, COUNT(*) FROM v_transaction_details GROUP BY category")
     cat_rows = cursor.fetchall()
     categories = {row[0]: row[1] for row in cat_rows}
 
