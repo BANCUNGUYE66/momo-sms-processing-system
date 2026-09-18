@@ -103,6 +103,11 @@ The project will follow an organized structure based on the requirements of the 
 │   ├── chart_handler.js
 │   └── assets/
 │
+├── database/
+│   ├── schema.sql
+│   ├── seed.sql
+│   └── database_setup.sql
+│
 ├── data/
 │   ├── raw/
 │   │   └── momo.xml
@@ -129,6 +134,7 @@ The project will follow an organized structure based on the requirements of the 
 │   └── schemas.py
 │
 ├── scripts/
+│   ├── init_db.py
 │   ├── run_etl.sh
 │   ├── export_json.sh
 │   └── serve_frontend.sh
@@ -136,9 +142,12 @@ The project will follow an organized structure based on the requirements of the 
 ├── tests/
 │   ├── test_parse_xml.py
 │   ├── test_clean_normalize.py
-│   └── test_categorize.py
+│   ├── test_categorize.py
+│   └── test_database.py
 │
 └── docs/
+    ├── sqlite_database_design.md
+    ├── erd_sqlite.puml
     └── system-architecture.png
 ```
 
@@ -354,9 +363,12 @@ This log records AI interactions in accordance with the course **AI Usage Policy
 | **2026-09-15** | Jean de Dieu | Documentation Grammar & Syntax | Reviewing 250–300 word ERD design rationale text for grammatical clarity | Polished technical explanation phrasing and verified word count (257 words) |
 | **2026-09-15** | Jean de Dieu | MySQL Best Practices Verification | Researching MySQL 8.0 `COMMENT` syntax and `CHECK` constraint syntax | Confirmed `ENGINE=InnoDB` and `CONSTRAINT chk_... CHECK (...)` syntax compliance |
 | **2026-09-15** | Jean de Dieu | Git Command Syntax Verification | Checking Git command syntax for local exclude (`.git/info/exclude`) and branch management | Applied `.git/info/exclude` configuration for local file exclusion |
+| **2026-09-18** | Eloi | SQLite syntax verification | Confirm `PRAGMA foreign_keys`, CHECK replacements for ENUM, and `CREATE VIEW` syntax | Applied verified SQLite DDL in `database/schema.sql` |
+| **2026-09-18** | Eloi | Documentation formatting | Structure entity tables and relationship summary for Assignment 2 | Formatted `docs/sqlite_database_design.md` |
 
 ### Attribution & Code Marking
 - **SQL DDL / DML (`database/database_setup.sql`)**: Author-designed 3NF relational schema. AI used strictly for verifying MySQL constraint syntax.
+- **SQLite schema (`database/schema.sql`, `database/seed.sql`)**: Author-designed SQLite 3NF schema, entities, and relationships. AI used for SQLite constraint syntax verification.
 - **JSON Schemas (`examples/json_schemas.json`)**: Author-designed serialization mappings. AI used for JSON syntax formatting validation.
-- **ERD Design (`docs/erd_diagram.pdf`)**: Author-designed entity relationships. AI used for verifying PlantUML rendering syntax.
+- **ERD Design (`docs/erd_diagram.pdf`, `docs/erd_sqlite.puml`)**: Author-designed entity relationships. AI used for verifying PlantUML rendering syntax.
 
