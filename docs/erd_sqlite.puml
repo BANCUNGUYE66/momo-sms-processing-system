@@ -1,0 +1,74 @@
+@startuml MoMo_SQLite_ERD
+!theme plain
+title MoMo SMS Processing System — SQLite Entity Relationship Diagram
+skinparam linetype ortho
+skinparam roundcorner 8
+hide circle
+hide methods
+
+entity "users" as users {
+  * **id** : INTEGER <<PK>>
+  --
+  * phone_number : TEXT <<UK>>
+  * name : TEXT
+  * user_type : TEXT
+  wallet_balance : NUMERIC
+  created_at : TEXT
+}
+
+entity "transaction_categories" as categories {
+  * **id** : INTEGER <<PK>>
+  --
+  * code : TEXT <<UK>>
+  * category_name : TEXT <<UK>>
+  * tx_type : TEXT
+  description : TEXT
+  created_at : TEXT
+}
+
+entity "user_category_preferences" as prefs {
+  * **user_id** : INTEGER <<PK, FK>>
+  * **category_id** : INTEGER <<PK, FK>>
+  --
+  notification_enabled : INTEGER
+  created_at : TEXT
+}
+
+entity "transactions" as tx {
+  * **id** : INTEGER <<PK>>
+  --
+  transaction_ref : TEXT <<UK>>
+  * **sender_id** : INTEGER <<FK>>
+  **receiver_id** : INTEGER <<FK>>
+  * **category_id** : INTEGER <<FK>>
+  * amount : NUMERIC
+  fee_charged : NUMERIC
+  closing_balance : NUMERIC
+  * timestamp : TEXT
+  status : TEXT
+  * raw_text : TEXT
+  created_at : TEXT
+}
+
+entity "system_logs" as logs {
+  * **id** : INTEGER <<PK>>
+  --
+  * log_level : TEXT
+  * module_name : TEXT
+  * message : TEXT
+  timestamp : TEXT
+}
+
+users ||--o{ tx : "sends (sender_id)"
+users ||--o{ tx : "receives (receiver_id)"
+categories ||--o{ tx : "classifies"
+users ||--o{ prefs : "sets"
+categories ||--o{ prefs : "applies to"
+
+note right of logs
+  Independent audit table.
+  No foreign keys so ETL errors
+  can still be recorded.
+end note
+
+@enduml
