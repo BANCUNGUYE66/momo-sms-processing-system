@@ -63,9 +63,13 @@ class TransactionRequestHandler(BaseHTTPRequestHandler):
 
     # -- routing -----------------------------------------------------------
     def do_GET(self):
+        parsed = urlparse(self.path)
+        if parsed.path == "/":
+            # Public health-check so visiting the bare host in a browser doesn't 401.
+            return self._send_json(200, {"message": "MoMo SMS REST API is running", "docs": "/transactions"})
+
         if not self._require_auth():
             return
-        parsed = urlparse(self.path)
         if parsed.path == "/transactions":
             query = parse_qs(parsed.query)
             limit = int(query["limit"][0]) if "limit" in query else None
