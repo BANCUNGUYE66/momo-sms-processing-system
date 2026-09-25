@@ -339,6 +339,34 @@ At the end of the project, the team expects to have an enterprise-level full-sta
 
 [View GitHub Repository](https://github.com/BANCUNGUYE66/process_momo_sms)
 
+## 16. REST API — Basic Auth (Assignment 2)
+
+Building on the ETL/dashboard foundation, `api/rest_api.py` adds a plain
+Python (`http.server`) REST API with CRUD endpoints over MoMo SMS
+transactions, protected by HTTP Basic Authentication.
+
+* `data/raw/modified_sms_v2.xml` — dataset used to seed the API's in-memory store.
+* `api/rest_api.py`, `api/data_store.py`, `api/auth.py`, `api/rest_config.py` — server, CRUD storage, Basic Auth, and config.
+* `docs/api_docs.md` — full endpoint documentation (requests, responses, error codes) and a discussion of Basic Auth's weaknesses vs. JWT/OAuth2.
+* `tests/test_rest_api.py` — automated tests covering auth (401) and the full CRUD cycle.
+
+### Run it
+
+```bash
+source .venv/bin/activate
+python -m api.rest_api
+# or: scripts/run_rest_api.sh
+```
+
+Default credentials: `admin` / `momo1234` (override with `API_USERNAME` /
+`API_PASSWORD` env vars). Server listens on `http://0.0.0.0:8001` by default
+(override with `REST_API_HOST` / `REST_API_PORT`).
+
+```bash
+curl -u admin:momo1234 http://localhost:8001/transactions
+```
+
+
 ### Scrum Board
 
 [View Scrum Board](https://github.com/BANCUNGUYE66/momo-sms-processing-system/issues)
