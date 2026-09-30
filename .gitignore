@@ -14,5 +14,7 @@ temp_auto_push.bat
 *.sqlite3-wal
 *.sqlite3-shm
 data/db.sqlite3
-.gitignore
 branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
