@@ -5,11 +5,15 @@ __pycache__/
 .venv/
 venv/
 
+temp_auto_push.bat
 # Environment
-.env
 
 # Local SQLite database files
 *.sqlite3
 *.sqlite3-wal
 *.sqlite3-shm
 data/db.sqlite3
+.gitignore
+branch_structure.json
+config.bat
+node_modules
