@@ -1,0 +1,10 @@
+$ curl -i -u wrong:badpass http://localhost:8001/transactions
+
+HTTP/1.0 401 Unauthorized
+Server: MoMoRestAPI/1.0 Python/3.14.3
+Date: Wed, 30 Sep 2026 07:41:39 GMT
+WWW-Authenticate: Basic realm="MoMo SMS API"
+Content-Type: application/json
+Content-Length: 57
+
+{"error": "Unauthorized: invalid or missing credentials"}
