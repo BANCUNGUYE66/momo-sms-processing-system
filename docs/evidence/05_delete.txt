@@ -1,0 +1,16 @@
+$ curl -i -u admin:momo1234 -X DELETE http://localhost:8001/transactions/1692
+
+HTTP/1.0 204 No Content
+Server: MoMoRestAPI/1.0 Python/3.14.3
+Date: Wed, 30 Sep 2026 07:41:39 GMT
+
+
+$ curl -i -u admin:momo1234 http://localhost:8001/transactions/1692
+
+HTTP/1.0 404 Not Found
+Server: MoMoRestAPI/1.0 Python/3.14.3
+Date: Wed, 30 Sep 2026 07:41:39 GMT
+Content-Type: application/json
+Content-Length: 39
+
+{"error": "Transaction 1692 not found"}
