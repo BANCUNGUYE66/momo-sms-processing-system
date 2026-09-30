@@ -1,0 +1,38 @@
+=== 1) GET /transactions (no credentials) -> expect 401 ===
+HTTP 401
+
+=== 2) GET /transactions (wrong credentials) -> expect 401 ===
+HTTP 401
+
+=== 3) GET /transactions (authorized) -> expect 200 ===
+[{"id": 1, "type": "RECEIVED", "amount": 2000.0, "sender": "Jane Smith", "receiver": "Own Account", "timestamp": "2024-05-10T16:30:58.724000", "raw_text": "You have received 2000 RWF from Jane Smith (*********013) on your mobile money account at 2024-05-10 16:30:51. Message from sender: . Your new balance:2000 RWF. Financial Transaction Id: 76662021700."}, {"id": 2, "type": "PAYMENT", "amount": 1000.0, "sender": "Own Account", "receiver": "Jane Smith", "timestamp": "2024-05-10T16:31:46.754000", "raw_text": "TxId: 73214484437. Your payment of 1,000 RWF to Jane Smith 12845 has been completed at 2024-05-10 16:31:39. Your new balance: 1,000 RWF. Fee was 0 RWF.Kanda*182*16# wiyandikishe muri poromosiyo ya BivaMoMotima, ugire amahirwe yo gutsindira ibihembo bishimishije."}]
+
+=== 4) GET /transactions/1 -> expect 200 ===
+{"id": 1, "type": "RECEIVED", "amount": 2000.0, "sender": "Jane Smith", "receiver": "Own Account", "timestamp": "2024-05-10T16:30:58.724000", "raw_text": "You have received 2000 RWF from Jane Smith (*********013) on your mobile money account at 2024-05-10 16:30:51. Message from sender: . Your new balance:2000 RWF. Financial Transaction Id: 76662021700."}
+
+=== 5) POST /transactions (valid) -> expect 201 ===
+HTTP 201
+{"id": 1693, "type": "TRANSFER", "amount": 12000.0, "sender": "Aimable", "receiver": "Richard", "timestamp": "2026-09-30T09:42:59.565132", "raw_text": ""}
+Created id: 1693
+
+=== 6) POST /transactions (missing required field) -> expect 400 ===
+HTTP 400
+
+=== 7) PUT /transactions/1693 (update amount) -> expect 200 ===
+{"id": 1693, "type": "TRANSFER", "amount": 20000.0, "sender": "Aimable", "receiver": "Richard", "timestamp": "2026-09-30T09:42:59.565132", "raw_text": ""}
+HTTP 200
+
+=== 8) PUT /transactions/999999 (nonexistent id) -> expect 404 ===
+HTTP 404
+
+=== 9) DELETE /transactions/1693 -> expect 204 ===
+HTTP 204
+
+=== 10) GET /transactions/1693 after delete -> expect 404 ===
+{"error": "Transaction 1693 not found"}
+HTTP 404
+
+=== 11) DELETE /transactions/999999 (already gone) -> expect 404 ===
+HTTP 404
+
+Done. Review the HTTP codes above against the expectations in each section header.

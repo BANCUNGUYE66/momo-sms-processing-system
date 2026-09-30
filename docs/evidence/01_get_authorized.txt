@@ -1,0 +1,9 @@
+$ curl -i -u admin:momo1234 "http://localhost:8001/transactions?limit=1"
+
+HTTP/1.0 200 OK
+Server: MoMoRestAPI/1.0 Python/3.14.3
+Date: Wed, 30 Sep 2026 07:41:39 GMT
+Content-Type: application/json
+Content-Length: 358
+
+[{"id": 1, "type": "RECEIVED", "amount": 2000.0, "sender": "Jane Smith", "receiver": "Own Account", "timestamp": "2024-05-10T16:30:58.724000", "raw_text": "You have received 2000 RWF from Jane Smith (*********013) on your mobile money account at 2024-05-10 16:30:51. Message from sender: . Your new balance:2000 RWF. Financial Transaction Id: 76662021700."}]
