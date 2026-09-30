@@ -1,0 +1,11 @@
+$ curl -i -u admin:momo1234 -X POST http://localhost:8001/transactions \
+    -H "Content-Type: application/json" \
+    -d '{"amount": 12000, "sender": "Eloi", "receiver": "Aimable", "type": "TRANSFER"}'
+
+HTTP/1.0 201 Created
+Server: MoMoRestAPI/1.0 Python/3.14.3
+Date: Wed, 30 Sep 2026 07:41:39 GMT
+Content-Type: application/json
+Content-Length: 151
+
+{"id": 1692, "type": "TRANSFER", "amount": 12000.0, "sender": "Eloi", "receiver": "Aimable", "timestamp": "2026-09-30T09:41:39.709087", "raw_text": ""}
