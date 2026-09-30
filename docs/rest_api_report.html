@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building and Securing a REST API — MoMo SMS Processing System</title>
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 15mm 16mm 15mm;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    color: #1c1917;
+    font-family: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+  h1, h2, h3, h4 {
+    font-family: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.25;
+    page-break-after: avoid;
+  }
+  h1 { font-size: 22pt; margin: 0 0 4px; letter-spacing: -0.3px; }
+  h2 {
+    font-size: 14.5pt;
+    margin: 22px 0 8px;
+    padding-top: 4px;
+    border-top: 1.5px solid #1e3a5f;
+    color: #1e3a5f;
+  }
+  h3 { font-size: 12pt; margin: 14px 0 4px; color: #1e3a5f; }
+  h4 { font-size: 11pt; margin: 10px 0 4px; }
+  p { margin: 0 0 8px; }
+  ul, ol { margin: 4px 0 10px; padding-left: 1.2em; }
+  li { margin: 2px 0; }
+  code, pre {
+    font-family: Menlo, Consolas, "Courier New", monospace;
+  }
+  code {
+    font-size: 9pt;
+    background: #f4f1ea;
+    padding: 0 3px;
+  }
+  pre {
+    background: #f7f5f0;
+    border: 1px solid #e4dfd4;
+    border-left: 3px solid #1e3a5f;
+    padding: 8px 10px;
+    font-size: 8.4pt;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    word-break: break-word;
+    page-break-inside: avoid;
+    margin: 6px 0 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 12px;
+    font-family: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 8.6pt;
+    line-height: 1.3;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #d6d3d1;
+    padding: 3px 5px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #1e3a5f; color: #fff; font-weight: 600; }
+  tr:nth-child(even) td { background: #f8f6f2; }
+  .meta {
+    font-family: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+    color: #44403c;
+    margin: 0 0 2px;
+  }
+  .rule { height: 3px; background: #1e3a5f; margin: 10px 0 12px; }
+  .note {
+    font-size: 10pt;
+    color: #44403c;
+  }
+  .endpoint { page-break-inside: avoid; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<p class="meta">Enterprise Software Development</p>
+<h1>Building and Securing a REST API</h1>
+<p class="meta">MoMo SMS Data Processing System</p>
+<p class="meta">Team: Aimable (Lead), Richard, Jean de Dieu Tuyishime, Eloi</p>
+<p class="meta">30 September 2026</p>
+<p class="meta">Repository: https://github.com/BANCUNGUYE66/momo-sms-processing-system</p>
+<div class="rule"></div>
+
+<h2>1. Introduction to API Security</h2>
+
+<p>The MoMo SMS processing system reads mobile-money text messages from <code>data/raw/modified_sms_v2.xml</code>, turns each message into a transaction record, and now exposes those records through a REST API. A transaction record holds an id, a type, an amount in RWF, a sender, a receiver, a timestamp, and the original message text. That is financial data. A client that can list, create, change, or delete it should have to prove who it is first.</p>
+
+<p>The API is a plain-Python server built with the standard-library <code>http.server</code> module (<code>api/rest_api.py</code>). It does not use a web framework. Every path under <code>/transactions</code> is protected with HTTP Basic Authentication, implemented in <code>api/auth.py</code>. The server reads the <code>Authorization</code> header, base64-decodes the <code>username:password</code> pair, and compares both values with the configured credentials using a constant-time comparison. The demo account is <code>admin</code> / <code>momo1234</code>. Those values can be replaced with the <code>API_USERNAME</code> and <code>API_PASSWORD</code> environment variables.</p>
+
+<p>If the header is missing, malformed, or does not match, the server does not return transaction data. It responds with <strong>401 Unauthorized</strong>, a <code>WWW-Authenticate: Basic realm="MoMo SMS API"</code> header, and a JSON body: <code>{"error": "Unauthorized: invalid or missing credentials"}</code>. A request that authenticates successfully can then use the CRUD endpoints. Creating, updating, and deleting still check the body and the id, and return 400 or 404 when those are wrong. Authentication and input checking are separate steps.</p>
+
+<p>Basic Authentication is enough to stop an anonymous client, which is what this assignment requires. It is a weak scheme for a real payment system. Section 4 explains why, and why JWT or OAuth2 would be a stronger design. The practical minimum, even with Basic Auth, is to send it only over HTTPS so the encoded password is not visible on the network.</p>
+
+<h2>2. Documentation of Endpoints</h2>
+
+<p>The server listens on <code>http://localhost:8001</code> when started with <code>python -m api.rest_api</code>. The store is seeded from the parsed XML. Records are kept in a dictionary keyed by id, so a lookup by id does not scan the full list. The same dictionary is what the DSA comparison in Section 3 measures.</p>
+
+<div class="endpoint">
+<h3>GET /transactions</h3>
+<p>Lists transactions. Optional query parameters <code>limit</code> and <code>offset</code> page the list.</p>
+<pre>curl -u admin:momo1234 "http://localhost:8001/transactions?limit=2"</pre>
+<p><strong>200 OK</strong></p>
+<pre>[
+  {
+    "id": 1,
+    "type": "RECEIVED",
+    "amount": 2000.0,
+    "sender": "Jane Smith",
+    "receiver": "Own Account",
+    "timestamp": "2024-05-10T16:30:58.724000",
+    "raw_text": "You have received 2000 RWF from Jane Smith ..."
+  }
+]</pre>
+<p class="note">Error: 401 if credentials are missing or wrong.</p>
+</div>
+
+<div class="endpoint">
+<h3>GET /transactions/{id}</h3>
+<p>Returns one transaction. The id in the path must be an integer.</p>
+<pre>curl -u admin:momo1234 http://localhost:8001/transactions/1</pre>
+<p><strong>200 OK</strong></p>
+<pre>{
+  "id": 1,
+  "type": "RECEIVED",
+  "amount": 2000.0,
+  "sender": "Jane Smith",
+  "receiver": "Own Account",
+  "timestamp": "2024-05-10T16:30:58.724000",
+  "raw_text": "You have received 2000 RWF from Jane Smith ..."
+}</pre>
+<p class="note">Errors: 400 if the id is not an integer, 401 if credentials are missing or wrong, 404 if that id does not exist.</p>
+</div>
+
+<div class="endpoint">
+<h3>POST /transactions</h3>
+<p>Creates a transaction. <code>amount</code>, <code>sender</code>, and <code>receiver</code> are required. <code>type</code> defaults to <code>OTHER</code>, <code>timestamp</code> defaults to the current time, and <code>raw_text</code> is optional.</p>
+<pre>curl -u admin:momo1234 -X POST http://localhost:8001/transactions \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 5000, "sender": "Alice", "receiver": "Bob", "type": "TRANSFER"}'</pre>
+<p><strong>201 Created</strong></p>
+<pre>{
+  "id": 1694,
+  "type": "TRANSFER",
+  "amount": 5000.0,
+  "sender": "Alice",
+  "receiver": "Bob",
+  "timestamp": "2026-09-25T09:00:00.000000",
+  "raw_text": ""
+}</pre>
+<p class="note">Errors: 400 if the JSON is invalid, a required field is missing, or <code>amount</code> is not numeric. 401 if credentials are missing or wrong.</p>
+</div>
+
+<div class="endpoint">
+<h3>PUT /transactions/{id}</h3>
+<p>Updates a transaction. The body may include any subset of <code>type</code>, <code>amount</code>, <code>sender</code>, <code>receiver</code>, <code>timestamp</code>, and <code>raw_text</code>. Only the fields that are sent are changed.</p>
+<pre>curl -u admin:momo1234 -X PUT http://localhost:8001/transactions/1694 \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 7500}'</pre>
+<p><strong>200 OK</strong> — the same record, with <code>amount</code> now <code>7500.0</code>.</p>
+<p class="note">Errors: 400 if the id is not an integer, the JSON is invalid, or <code>amount</code> is not numeric. 401 if credentials are missing or wrong. 404 if that id does not exist.</p>
+</div>
+
+<div class="endpoint">
+<h3>DELETE /transactions/{id}</h3>
+<p>Deletes a transaction. A successful delete has an empty body.</p>
+<pre>curl -u admin:momo1234 -X DELETE http://localhost:8001/transactions/1694</pre>
+<p><strong>204 No Content</strong></p>
+<p class="note">Errors: 400 if the id is not an integer, 401 if credentials are missing or wrong, 404 if that id does not exist.</p>
+</div>
+
+<h3>Error codes</h3>
+<table>
+  <thead>
+    <tr><th>Code</th><th>When it is returned</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>200</td><td>Successful GET or PUT</td></tr>
+    <tr><td>201</td><td>POST created a transaction</td></tr>
+    <tr><td>204</td><td>DELETE removed a transaction; the body is empty</td></tr>
+    <tr><td>400</td><td>Bad id, invalid JSON, or a missing or non-numeric field</td></tr>
+    <tr><td>401</td><td>Missing or wrong Basic Auth credentials</td></tr>
+    <tr><td>404</td><td>No transaction with that id</td></tr>
+    <tr><td>405</td><td>That HTTP method is not allowed on the path</td></tr>
+  </tbody>
+</table>
+
+<p>These codes were checked against a running server. An authorized <code>GET /transactions?limit=1</code> returned 200. The same path with username <code>wrong</code> and password <code>badpass</code> returned 401 and the <code>WWW-Authenticate</code> header. A POST created a record (201), a PUT changed its amount (200), and a DELETE removed it (204). A following GET of that id returned 404. The curl transcripts and screenshots are in <code>docs/evidence/</code> and <code>screenshots/</code>.</p>
+
+<h2>3. Results of the DSA Comparison</h2>
+
+<p><code>dsa/xml_parser.py</code> reads every <code>&lt;sms&gt;</code> element in <code>modified_sms_v2.xml</code> and writes a list of dictionaries to <code>data/processed/transactions.json</code>. The run used for this comparison produced <strong>1,691</strong> records. Each dictionary has <code>id</code>, <code>type</code>, <code>amount</code>, <code>sender</code>, <code>receiver</code>, <code>timestamp</code>, and <code>raw_text</code>. Types are <code>RECEIVED</code>, <code>PAYMENT</code>, <code>TRANSFER</code>, <code>DEPOSIT</code>, <code>AIRTIME</code>, or <code>OTHER</code> when the message text does not match a known pattern.</p>
+
+<p>The search question is: given an id, how do we find that one record? <code>dsa/search.py</code> implements two answers.</p>
+
+<p><strong>Linear search</strong> walks the list from the first record to the last and compares <code>id</code> on each step. The best case is one comparison, when the target is first. The average and worst cases grow with the length of the list, so the cost is O(n). Extra memory is O(1). A missing id still costs a full scan of all 1,691 records.</p>
+
+<p><strong>Dictionary lookup</strong> first builds a Python dictionary, <code>id → record</code>, in one O(n) pass. After that, finding a record is a hash-table lookup. The average cost of a lookup is O(1): the id is hashed and the bucket is read directly. The dictionary uses O(n) extra memory. A missing id still takes one lookup, not a scan. This is the structure <code>api/data_store.py</code> uses for GET, PUT, and DELETE by id.</p>
+
+<p><code>dsa/benchmark.py</code> timed both methods on the full 1,691-record set. It chose 20 ids spread from the start of the list to the end, plus the missing id <code>999999</code>. Each id was searched 500 times and timed with <code>time.perf_counter_ns()</code>. The table reports the average time per search.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Target id</th>
+      <th>Found</th>
+      <th>Linear scans</th>
+      <th>Linear time</th>
+      <th>Dict scans</th>
+      <th>Dict time</th>
+      <th>Speedup</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>Yes</td><td>1</td><td>0.595 µs</td><td>1</td><td>0.463 µs</td><td>1.28×</td></tr>
+    <tr><td>90</td><td>Yes</td><td>90</td><td>10.383 µs</td><td>1</td><td>0.221 µs</td><td>46.94×</td></tr>
+    <tr><td>179</td><td>Yes</td><td>179</td><td>22.582 µs</td><td>1</td><td>0.165 µs</td><td>137.03×</td></tr>
+    <tr><td>268</td><td>Yes</td><td>268</td><td>33.580 µs</td><td>1</td><td>0.163 µs</td><td>206.52×</td></tr>
+    <tr><td>357</td><td>Yes</td><td>357</td><td>40.509 µs</td><td>1</td><td>0.155 µs</td><td>261.01×</td></tr>
+    <tr><td>446</td><td>Yes</td><td>446</td><td>58.705 µs</td><td>1</td><td>0.150 µs</td><td>390.32×</td></tr>
+    <tr><td>535</td><td>Yes</td><td>535</td><td>103.440 µs</td><td>1</td><td>0.180 µs</td><td>574.67×</td></tr>
+    <tr><td>624</td><td>Yes</td><td>624</td><td>100.806 µs</td><td>1</td><td>0.161 µs</td><td>626.12×</td></tr>
+    <tr><td>713</td><td>Yes</td><td>713</td><td>98.026 µs</td><td>1</td><td>0.156 µs</td><td>627.57×</td></tr>
+    <tr><td>802</td><td>Yes</td><td>802</td><td>171.868 µs</td><td>1</td><td>1.353 µs</td><td>127.06×</td></tr>
+    <tr><td>891</td><td>Yes</td><td>891</td><td>181.467 µs</td><td>1</td><td>0.189 µs</td><td>958.11×</td></tr>
+    <tr><td>980</td><td>Yes</td><td>980</td><td>161.287 µs</td><td>1</td><td>0.531 µs</td><td>303.86×</td></tr>
+    <tr><td>1069</td><td>Yes</td><td>1069</td><td>222.196 µs</td><td>1</td><td>0.163 µs</td><td>1,366.52×</td></tr>
+    <tr><td>1158</td><td>Yes</td><td>1158</td><td>220.751 µs</td><td>1</td><td>0.152 µs</td><td>1,450.40×</td></tr>
+    <tr><td>1247</td><td>Yes</td><td>1247</td><td>243.183 µs</td><td>1</td><td>0.159 µs</td><td>1,529.45×</td></tr>
+    <tr><td>1336</td><td>Yes</td><td>1336</td><td>362.077 µs</td><td>1</td><td>0.161 µs</td><td>2,254.53×</td></tr>
+    <tr><td>1425</td><td>Yes</td><td>1425</td><td>465.841 µs</td><td>1</td><td>0.515 µs</td><td>904.90×</td></tr>
+    <tr><td>1514</td><td>Yes</td><td>1514</td><td>598.133 µs</td><td>1</td><td>0.156 µs</td><td>3,834.19×</td></tr>
+    <tr><td>1603</td><td>Yes</td><td>1603</td><td>269.661 µs</td><td>1</td><td>0.174 µs</td><td>1,548.00×</td></tr>
+    <tr><td>999999</td><td>No</td><td>1691</td><td>358.687 µs</td><td>1</td><td>0.384 µs</td><td>934.57×</td></tr>
+  </tbody>
+</table>
+
+<p>Across those searches, linear search averaged <strong>186.19 µs</strong>. Dictionary lookup averaged <strong>0.28 µs</strong>. Dictionary lookup was <strong>647.55 times faster</strong> overall. The gap is small for id 1, because linear search stops on the first record. It grows as the target sits further down the list. For id 1514, linear search did 1,514 comparisons and took 598 µs, while the dictionary still did one lookup in 0.156 µs. For a missing id, linear search walked all 1,691 records. The dictionary answered in one lookup.</p>
+
+<p>Dictionary lookup is faster because a hash table computes a bucket from the key and reads that bucket. The work does not depend on how many records are stored, as long as collisions stay rare. Linear search repeats a comparison once per record until it hits the id or reaches the end, so a later record always costs more. The tradeoff is memory: the dictionary keeps a second structure of size O(n). For this API that cost is appropriate, because almost every single-record request is a lookup by id.</p>
+
+<p>Other structures could help in different cases. A list kept sorted by id can be searched with binary search in O(log n), about 11 comparisons for 1,691 records, with no extra index, but inserting a record into the middle of the array is O(n). A balanced tree (AVL or red-black) keeps search, insert, and delete at O(log n) and also supports range queries, which a hash table does not. A B-tree is the usual on-disk index when the records no longer fit in a convenient memory dictionary. A second dictionary keyed by sender or type would make those filters O(1) as well. None of those replace the id index the API uses today. They answer different queries.</p>
+
+<h2 style="page-break-before: always;">4. Reflection on Basic Auth Limitations</h2>
+
+<p>Basic Authentication sends the username and password on every request. The pair is only base64-encoded. Base64 is an encoding, not encryption. Anyone who can see the HTTP request — on a network without TLS, in a proxy log, or in a server access log — can decode <code>Authorization: Basic …</code> and recover the password. The demo header <code>Authorization: Basic YWRtaW46bW9tbzEyMzQ=</code> decodes directly to <code>admin:momo1234</code>.</p>
+
+<p>The same password is reused forever. There is no expiry, no scope, and no way to cut off one client without changing the shared password for every client. The server also cannot tell two legitimate callers apart if they both use <code>admin</code>. That is acceptable for a class demo with one account. It is a poor fit for an API that mobile apps and other developers would call, which is the setting described in the assignment.</p>
+
+<p>Two stronger designs:</p>
+<ul>
+  <li><strong>JWT.</strong> The client logs in once. The server returns a signed token with an expiry and, if needed, a role or scope. Later requests send the token, not the password. The server checks the signature and the expiry. A token can lapse on its own, and the password is not repeated on every call.</li>
+  <li><strong>OAuth2.</strong> A client receives a short-lived access token, and usually a refresh token, with a limited scope. A third-party app can be allowed to read transactions without ever receiving the user’s password. Access can be revoked for that app alone.</li>
+</ul>
+
+<p>If Basic Auth is kept, it should be used only over HTTPS, so the encoded password is inside TLS. The credentials in this project are demo values committed for the assignment. They should not be reused on a public server.</p>
+
+<p class="note">Source notes for this report: endpoint behaviour is implemented in <code>api/rest_api.py</code> and <code>api/auth.py</code> and written up in <code>docs/api_docs.md</code>. The search implementations, the 1,691-record benchmark, and the timing table are in <code>dsa/search.py</code>, <code>dsa/benchmark.py</code>, and <code>docs/dsa_analysis.md</code>.</p>
+
+</body>
+</html>
