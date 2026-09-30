@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 venv/
 
+temp_auto_push.bat
 # Environment
 .env
 
