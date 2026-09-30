@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 venv/
 
+temp_auto_push.bat
 # Environment
 .env
 
@@ -13,3 +14,5 @@ venv/
 *.sqlite3-wal
 *.sqlite3-shm
 data/db.sqlite3
+.gitignore
+branch_structure.json
